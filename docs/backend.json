@@ -1,0 +1,115 @@
+
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Represents a user's profile information.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The user's unique ID."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "carNumber": {
+          "type": "string",
+          "description": "The user's car license plate number."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["user", "manager"],
+          "description": "The user's role."
+        }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "ParkingSpot": {
+      "title": "Parking Spot",
+      "description": "Represents a single parking spot in the facility.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the parking spot (e.g., 'A-1')."
+        },
+        "spotNumber": {
+          "type": "number",
+          "description": "The number of the spot within its zone."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["regular", "accessible", "ev"],
+          "description": "The type of the parking spot."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["available", "occupied", "reserved", "unavailable"],
+          "description": "The current status of the parking spot."
+        },
+        "occupiedBy": {
+          "type": "object",
+          "properties": {
+            "licensePlate": { "type": "string" },
+            "startTime": { "type": "string", "format": "date-time" }
+          }
+        },
+        "reservedBy": {
+          "type": "object",
+          "properties": {
+            "userId": { "type": "string" },
+            "carNumber": { "type": "string" },
+            "phoneNumber": { "type": "string" },
+            "reservedAt": { "type": "string", "format": "date-time" }
+          }
+        }
+      },
+      "required": ["id", "spotNumber", "type", "status"]
+    },
+    "HardwareSession": {
+      "title": "Hardware Session",
+      "description": "Represents a parking session initiated by hardware.",
+      "type": "object",
+      "properties": {
+        "licensePlate": {
+          "type": "string"
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["licensePlate", "startTime"]
+    }
+  },
+  "auth": {
+    "providers": ["password", "google.com"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Stores public information about a user."
+    },
+    "/parkingSpots/{spotId}": {
+      "schema": {
+        "$ref": "#/entities/ParkingSpot"
+      },
+      "description": "Stores information about each parking spot."
+    },
+    "/hardwareSessions/{licensePlate}": {
+      "schema": {
+        "$ref": "#/entities/HardwareSession"
+      },
+      "description": "Stores temporary session data from hardware scanners."
+    }
+  }
+}
