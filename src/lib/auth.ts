@@ -22,7 +22,7 @@ export const verifyPassword = async (password: string, hash: string) =>
   bcrypt.compare(password, hash);
 
 export const createSessionToken = (payload: SessionPayload) =>
-  jwt.sign(payload, getAuthSecret(), { expiresIn: '7d' });
+  jwt.sign(payload, getAuthSecret(), { expiresIn: '365d' });
 
 export const verifySessionToken = (token: string): SessionPayload =>
   jwt.verify(token, getAuthSecret()) as SessionPayload;
@@ -46,7 +46,7 @@ export const setSessionCookie = (response: NextResponse, token: string) => {
     sameSite: 'lax',
     path: '/',
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: 60 * 60 * 24 * 365, // 1 year
   });
 };
 
