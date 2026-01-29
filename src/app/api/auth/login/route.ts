@@ -9,13 +9,13 @@ export async function POST(request: Request) {
   try {
 
     const body = await request.json();
-    const { identification: rawId, password } = body;
+    const { identification: rawId, password, email, carNumber } = body;
 
-    if (!rawId || !password) {
+    const identification = (rawId || email || carNumber)?.trim();
+
+    if (!identification || !password) {
       return NextResponse.json({ error: 'Missing credentials' }, { status: 400 });
     }
-
-    const identification = rawId.trim();
     const db = await getDb();
 
     // Search by email (lowercase) OR car number (uppercase)
