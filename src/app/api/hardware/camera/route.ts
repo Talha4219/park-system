@@ -8,17 +8,26 @@ export async function POST(request: Request) {
     try {
         // Parse JSON body
         const body = await request.json();
-        const base64Image = body.image;
+        const base64ImageString = body.image;
 
-        if (!base64Image) {
+        if (!base64ImageString) {
             return NextResponse.json({ error: 'No image data received in JSON body.' }, { status: 400 });
         }
 
+        // Handle Data URI prefix if present
+        let pureBase64 = base64ImageString;
+        if (base64ImageString.startsWith('data:')) {
+            const parts = base64ImageString.split(',');
+            if (parts.length > 1) {
+                pureBase64 = parts[1];
+            }
+        }
+
         // Decode Base64 to Buffer
-        const buffer = Buffer.from(base64Image, 'base64');
+        const buffer = Buffer.from(pureBase64, 'base64');
 
         if (!buffer || buffer.length === 0) {
-            return NextResponse.json({ error: 'Invalid start buffer.' }, { status: 400 });
+            return NextResponse.json({ error: 'Invalid image buffer.' }, { status: 400 });
         }
 
         // 1. Save File
@@ -49,8 +58,7 @@ export async function POST(request: Request) {
         }
 
         // 3. Trigger Entry Logic
-        const imagePath = `/cam-uploads/${filename}`;
-        const result = await assignSpotToVehicle(detectedPlate, imagePath);
+        const result = await assignSpotToVehicle(detectedPlate, base64ImageString);
 
         if (!result.success) {
             const status = result.status || 400;
@@ -60,7 +68,8 @@ export async function POST(request: Request) {
                     message: result.message,
                     spotId: result.spotId,
                     carNumber: detectedPlate,
-                    imagePath: `/cam-uploads/${filename}`
+                    imagePath: `/cam-uploads/${filename}`,
+                    image: base64ImageString
                 },
                 { status }
             );
@@ -75,7 +84,8 @@ export async function POST(request: Request) {
             carNumber: detectedPlate,
             startTime: result.startTime,
             userDisplayName: result.userDisplayName,
-            imagePath: `/cam-uploads/${filename}`
+            imagePath: `/cam-uploads/${filename}`,
+            image: base64ImageString
         });
 
     } catch (error) {

@@ -137,7 +137,7 @@ export default function CapturesPage() {
                                     viewMode === 'list' ? "w-80 h-full border-r border-white/5" : "aspect-video"
                                 )}>
                                     <img
-                                        src={log.imagePath}
+                                        src={log.image || log.imagePath}
                                         alt={`Capture ${log.licensePlate}`}
                                         className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110"
                                     />

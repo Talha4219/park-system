@@ -18,7 +18,8 @@ async function testUpload() {
 
   const imageBuffer = fs.readFileSync(IMAGE_PATH);
   const base64Image = imageBuffer.toString('base64');
-  const payload = JSON.stringify({ image: base64Image });
+  const imageDataUri = `data:image/jpeg;base64,${base64Image}`;
+  const payload = JSON.stringify({ image: imageDataUri });
 
   const options = {
     method: 'POST',

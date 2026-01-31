@@ -67,7 +67,7 @@ export async function assignSpotToVehicle(licensePlate: string, entryImage?: str
             await db.collection('cameraLogs').insertOne({
                 licensePlate,
                 spotId: assignedSpot.id,
-                imagePath: entryImage,
+                image: entryImage, // Store full image string
                 timestamp: startTime,
                 userDisplayName: user.displayName
             });
