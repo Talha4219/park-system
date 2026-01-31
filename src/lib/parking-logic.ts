@@ -1,7 +1,7 @@
 import { getDb } from './mongodb';
 import { ParkingSpot } from './types';
 
-export async function assignSpotToVehicle(licensePlate: string) {
+export async function assignSpotToVehicle(licensePlate: string, entryImage?: string) {
     const db = await getDb();
     const spotsCollection = db.collection('parkingSpots');
     const usersCollection = db.collection('users');
@@ -51,16 +51,35 @@ export async function assignSpotToVehicle(licensePlate: string) {
     }
 
     // 4. Update Spot to Occupied
+    const updatePayload: any = {
+        status: 'in-use',
+        occupiedBy: {
+            licensePlate,
+            startTime,
+        },
+    };
+
+    if (entryImage) {
+        updatePayload.occupiedBy.entryImage = entryImage;
+
+        // Log to cameraLogs collection for the dedicated captures page
+        try {
+            await db.collection('cameraLogs').insertOne({
+                licensePlate,
+                spotId: assignedSpot.id,
+                imagePath: entryImage,
+                timestamp: startTime,
+                userDisplayName: user.displayName
+            });
+        } catch (logError) {
+            console.error('Failed to log camera capture:', logError);
+        }
+    }
+
     await spotsCollection.updateOne(
         { _id: assignedSpot._id },
         {
-            $set: {
-                status: 'in-use',
-                occupiedBy: {
-                    licensePlate,
-                    startTime,
-                },
-            },
+            $set: updatePayload,
             $unset: { reservedBy: '' },
         }
     );

@@ -191,6 +191,25 @@ export function SpotDetailsSheet({ isOpen, onOpenChange, spot, onOccupy, onDepar
                         <Badge className="bg-blue-500/10 text-blue-400 border-none font-medium">Tracking Active</Badge>
                       </div>
                     </div>
+
+                    {spot.occupiedBy.entryImage && (
+                      <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-4">
+                        <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-muted-foreground">
+                          <ShieldAlert className="size-3" /> Entry Capture
+                        </div>
+                        <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-black/40">
+                          <img
+                            src={spot.occupiedBy.entryImage}
+                            alt="Entry Camera Capture"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-md text-[9px] font-bold text-white border border-white/10">
+                            LIVE LOG
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                   </div>
                 </div>
               )}

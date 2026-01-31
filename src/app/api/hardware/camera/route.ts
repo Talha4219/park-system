@@ -6,12 +6,19 @@ import { assignSpotToVehicle } from '@/lib/parking-logic';
 
 export async function POST(request: Request) {
     try {
-        // Read raw binary body directly
-        const arrayBuffer = await request.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
+        // Parse JSON body
+        const body = await request.json();
+        const base64Image = body.image;
+
+        if (!base64Image) {
+            return NextResponse.json({ error: 'No image data received in JSON body.' }, { status: 400 });
+        }
+
+        // Decode Base64 to Buffer
+        const buffer = Buffer.from(base64Image, 'base64');
 
         if (!buffer || buffer.length === 0) {
-            return NextResponse.json({ error: 'No image data received.' }, { status: 400 });
+            return NextResponse.json({ error: 'Invalid start buffer.' }, { status: 400 });
         }
 
         // 1. Save File
@@ -42,7 +49,8 @@ export async function POST(request: Request) {
         }
 
         // 3. Trigger Entry Logic
-        const result = await assignSpotToVehicle(detectedPlate);
+        const imagePath = `/cam-uploads/${filename}`;
+        const result = await assignSpotToVehicle(detectedPlate, imagePath);
 
         if (!result.success) {
             const status = result.status || 400;

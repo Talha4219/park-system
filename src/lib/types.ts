@@ -5,6 +5,7 @@ export type ParkingSpotStatus = 'available' | 'in-use' | 'unavailable' | 'booked
 export interface OccupiedDetails {
   licensePlate: string;
   startTime: string; // ISO string
+  entryImage?: string;
   isPaid?: boolean;
   isAtExit?: boolean;
   totalBill?: number;

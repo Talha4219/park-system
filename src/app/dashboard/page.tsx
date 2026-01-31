@@ -390,6 +390,56 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
+            <Card className="glass-card border-white/5 overflow-hidden">
+              <CardHeader className="pb-4">
+                <Link href="/dashboard/captures" className="hover:opacity-80 transition-opacity">
+                  <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+                    <Activity className="size-4 text-emerald-400" />
+                    Recent Entry Captures
+                  </CardTitle>
+                </Link>
+                <CardDescription className="text-xs mt-1">Live visual verification feed.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                {spots.filter(s => s.occupiedBy?.entryImage).reverse().length > 0 ? (
+                  spots
+                    .filter(s => s.occupiedBy?.entryImage)
+                    .sort((a, b) => new Date(b.occupiedBy!.startTime).getTime() - new Date(a.occupiedBy!.startTime).getTime())
+                    .slice(0, 5)
+                    .map((spot) => (
+                      <div
+                        key={spot.id}
+                        className="group relative rounded-2xl overflow-hidden border border-white/5 bg-white/5 cursor-pointer hover:border-primary/30 transition-all"
+                        onClick={() => handleSpotClick(spot)}
+                      >
+                        <div className="aspect-video relative">
+                          <img
+                            src={spot.occupiedBy!.entryImage}
+                            alt={`Capture for ${spot.id}`}
+                            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                          />
+                          <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[9px] font-bold border border-white/10 uppercase tracking-tighter">
+                            Spot {spot.id}
+                          </div>
+                        </div>
+                        <div className="p-3 flex items-center justify-between">
+                          <div>
+                            <p className="text-[11px] font-mono font-bold text-primary">{spot.occupiedBy!.licensePlate}</p>
+                            <p className="text-[9px] text-muted-foreground uppercase">{formatDistanceToNow(new Date(spot.occupiedBy!.startTime), { addSuffix: true })}</p>
+                          </div>
+                          <Badge variant="outline" className="text-[8px] h-4 border-emerald-500/20 text-emerald-400 bg-emerald-500/5">Verified</Badge>
+                        </div>
+                      </div>
+                    ))
+                ) : (
+                  <div className="py-10 text-center space-y-2 opacity-50">
+                    <Car className="size-8 mx-auto mb-2 opacity-20" />
+                    <p className="text-[10px] uppercase font-bold tracking-widest">No active captures</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             <Card className="glass-card border-white/5 bg-primary/5">
               <CardContent className="p-6 text-center space-y-2">
                 <ShieldAlert className="size-8 text-primary mx-auto mb-2" />
